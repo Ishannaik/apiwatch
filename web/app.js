@@ -55,6 +55,8 @@ function bare(id) {
     "xai/",
     "mistralai/",
     "mistral/",
+    "spacexai/",
+    "openrouter/",
   ];
   let again = true;
   while (again) {
@@ -93,13 +95,22 @@ function isAlias(id) {
   return /[@:]/.test(s) || /-(gt|lte)-\d+k/.test(s) || /-(thinking|think|free)$/.test(s);
 }
 
-function isOfficial(lab, srcs) {
+function isAgentId(id) {
+  const s = bare(id).toLowerCase();
+  return s.startsWith("antigravity-") || s.startsWith("grok-build") || s.startsWith("deep-research");
+}
+
+function isOfficial(lab, srcs, id) {
   const allow = LAB_SOURCES[lab] || [];
-  return srcs.some((src) => allow.includes(src));
+  if (srcs.some((src) => allow.includes(src))) return true;
+  // xAI docs omit grok-build; OpenRouter / Catwalk already list it.
+  return lab === "xai" && isAgentId(id);
 }
 
 function familyRank(id) {
   const s = bare(id).toLowerCase();
+  if (s.startsWith("antigravity-") || s.startsWith("grok-build")) return 80;
+  if (s.startsWith("deep-research")) return 70;
   if (/^gpt-\d/.test(s) && !s.includes("oss")) return 50;
   if (/^o[1-9]/.test(s)) return 45;
   if (/^chatgpt-/.test(s)) return 40;
@@ -208,7 +219,7 @@ async function load() {
       if (!matchesFilter(x.lab, filter)) return false;
       if (filter !== "all") {
         if (isAlias(x.id)) return false;
-        if (!isOfficial(x.lab, x.srcs)) return false;
+        if (!isOfficial(x.lab, x.srcs, x.id)) return false;
       }
       if (!needle) return true;
       return x.id.toLowerCase().includes(needle) || x.srcs.some((src) => src.includes(needle));
