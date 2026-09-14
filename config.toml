@@ -1,4 +1,4 @@
-timeout_secs = 25
+timeout_secs = 30
 webhook_env = "WEBHOOK"
 
 # Public catalogs only. OpenAI / Anthropic / Gemini / xAI / Groq /v1/models
@@ -17,6 +17,18 @@ url = "https://ai-gateway.vercel.sh/v1/models"
 kind = "openai_list"
 
 [[sources]]
+id = "huggingface"
+name = "Hugging Face router"
+url = "https://router.huggingface.co/v1/models"
+kind = "openai_list"
+
+[[sources]]
+id = "naga"
+name = "Naga"
+url = "https://api.naga.ac/v1/models"
+kind = "openai_list"
+
+[[sources]]
 id = "deepinfra"
 name = "DeepInfra"
 url = "https://api.deepinfra.com/v1/openai/models"
@@ -31,5 +43,5 @@ kind = "models_dev"
 [[sources]]
 id = "litellm"
 name = "LiteLLM prices"
-url = "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"
+url = "https://cdn.jsdelivr.net/gh/BerriAI/litellm@main/model_prices_and_context_window.json"
 kind = "object_keys"

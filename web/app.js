@@ -1,5 +1,15 @@
 const $ = (id) => document.getElementById(id);
 
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c]));
+}
+
 function fmtTime(unix) {
   if (!unix) return "—";
   const d = new Date(Number(unix) * 1000);
@@ -7,9 +17,9 @@ function fmtTime(unix) {
 }
 
 function pill(ok, status, notModified) {
-  if (!ok) return `<span class="pill fail">${status || "err"}</span>`;
+  if (!ok) return `<span class="pill fail">${esc(status || "err")}</span>`;
   if (notModified) return `<span class="pill ok">304</span>`;
-  return `<span class="pill ok">${status}</span>`;
+  return `<span class="pill ok">${esc(status)}</span>`;
 }
 
 async function load() {
@@ -26,16 +36,16 @@ async function load() {
   }
   $("sources").innerHTML = (s.sources || []).map((x) => `
     <tr>
-      <td class="name">${x.name}<div class="meta">${x.id}</div></td>
-      <td>${x.count ?? 0}</td>
+      <td class="name">${esc(x.name)}<div class="meta">${esc(x.id)}</div></td>
+      <td>${Number(x.count) || 0}</td>
       <td>${(x.added || []).length}</td>
       <td>${(x.removed || []).length}</td>
       <td>${pill(x.ok, x.status, x.not_modified)}</td>
-      <td>${x.ms ?? "—"}</td>
+      <td>${esc(x.ms ?? "—")}</td>
     </tr>`).join("");
   const events = s.events || [];
   $("events").innerHTML = events.length
-    ? events.map((e) => `<li class="${e.op}"><span class="meta">${fmtTime(e.ts)} ${e.source}</span> ${e.op === "add" ? "+" : "−"} ${e.id}</li>`).join("")
+    ? events.map((e) => `<li class="${e.op === "remove" ? "remove" : "add"}"><span class="meta">${esc(fmtTime(e.ts))} ${esc(e.source)}</span> ${e.op === "add" ? "+" : "−"} ${esc(e.id)}</li>`).join("")
     : `<li class="meta">${s.baseline ? "Baseline scan — next diff will show adds/removes." : "No changes yet."}</li>`;
 
   const all = [];
@@ -48,7 +58,7 @@ async function load() {
     const needle = (q || "").trim().toLowerCase();
     const shown = needle ? all.filter((x) => x.id.toLowerCase().includes(needle) || x.src.includes(needle)) : all;
     $("idmeta").textContent = `${shown.length} / ${all.length}`;
-    $("ids").innerHTML = shown.slice(0, 400).map((x) => `<li><span class="meta">${x.src}</span> ${x.id}</li>`).join("");
+    $("ids").innerHTML = shown.slice(0, 400).map((x) => `<li><span class="meta">${esc(x.src)}</span> ${esc(x.id)}</li>`).join("");
   };
   $("q").addEventListener("input", (e) => render(e.target.value));
   render("");

@@ -10,9 +10,11 @@ This is the cheatyyyy-style model-list watch without API keys. Provider endpoint
 |---|---|---|
 | OpenRouter | `https://openrouter.ai/api/v1/models` | none |
 | Vercel AI Gateway | `https://ai-gateway.vercel.sh/v1/models` | none |
+| Hugging Face router | `https://router.huggingface.co/v1/models` | none |
+| Naga | `https://api.naga.ac/v1/models` | none |
 | DeepInfra | `https://api.deepinfra.com/v1/openai/models` | none |
 | models.dev | `https://models.dev/api.json` | none |
-| LiteLLM prices | GitHub raw `model_prices_and_context_window.json` | none |
+| LiteLLM prices | jsDelivr `model_prices_and_context_window.json` | none |
 
 ETags are stored so unchanged catalogs return 304 and skip parse.
 
