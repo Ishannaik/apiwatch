@@ -57,6 +57,7 @@ id = "openai_docs"
 name = "OpenAI docs"
 url = "https://platform.openai.com/docs/models.md"
 kind = "html_regex"
+# Mintlify serves the same catalog at /api/docs/models/<id>.md
 patterns = ["/docs/models/([A-Za-z0-9._-]+)"]
 
 [[sources]]
@@ -75,7 +76,8 @@ kind = "openai_list"
 [[sources]]
 id = "xai_docs"
 name = "xAI docs"
-url = "https://docs.x.ai/developers/models.md"
+# .md sibling 404s; HTML pricing tables still list grok-* IDs.
+url = "https://docs.x.ai/developers/models"
 kind = "html_regex"
 patterns = ["\\b(grok-[0-9][A-Za-z0-9.-]*)"]
 
@@ -84,7 +86,13 @@ id = "groq_docs"
 name = "Groq docs"
 url = "https://console.groq.com/docs/models.md"
 kind = "html_regex"
-patterns = ["/docs/model/([A-Za-z0-9_./-]+)"]
+# HTML has /docs/model/<id>; the .md dump only has table IDs.
+patterns = [
+  "/docs/model/([A-Za-z0-9_./-]+)",
+  "\\b(llama-[0-9][a-z0-9.-]*)",
+  "\\b(whisper-[a-z0-9.-]+)",
+  "\\b((?:openai|qwen|groq|meta-llama|minimaxai|canopylabs|moonshotai)/[A-Za-z0-9._-]+)",
+]
 
 [[sources]]
 id = "together_docs"
@@ -98,11 +106,86 @@ id = "fireworks_docs"
 name = "Fireworks docs"
 url = "https://docs.fireworks.ai/getting-started/models.md"
 kind = "html_regex"
-patterns = ["(accounts/fireworks/(?:models|routers)/[A-Za-z0-9._-]+)"]
+patterns = ["(accounts/[A-Za-z0-9_-]+/(?:models|routers)/[A-Za-z0-9._-]+)"]
 
 [[sources]]
 id = "mistral_docs"
 name = "Mistral docs"
+# .md 404s; HTML is JS-heavy for current IDs, but the deprecation table is in source.
 url = "https://docs.mistral.ai/getting-started/models/models_overview"
 kind = "html_regex"
-patterns = ["\\b((?:mistral|codestral|pixtral|ministral|devstral|magistral|voxtral|open-mistral|open-mixtral)-[a-z0-9][a-z0-9.-]*)"]
+patterns = [
+  "\\b((?:mistral|codestral|pixtral|ministral|devstral|magistral|voxtral|open-mistral|open-mixtral|open-codestral|mistral-ocr|mistral-moderation|mistral-embed|codestral-embed|mistral-saba|labs-mistral|labs-devstral|labs-leanstral)-[a-z0-9][a-z0-9.-]*)",
+]
+
+# Google listModels is 403 without a key. .md without .txt is HTML; .md.txt is markdown.
+# Vertex HTML is a docs SPA with slug junk (gemini-capabilities). Skip it.
+# Bare /docs/models/imagen is a category page; sanitize_id drops those slugs.
+[[sources]]
+id = "google_docs"
+name = "Google Gemini docs"
+url = "https://ai.google.dev/gemini-api/docs/models.md.txt"
+kind = "html_regex"
+patterns = ["/docs/models/([A-Za-z0-9._-]+)"]
+
+[[sources]]
+id = "google_llms"
+name = "Google Gemini llms.txt"
+url = "https://ai.google.dev/gemini-api/docs/models/llms.txt"
+kind = "html_regex"
+patterns = ["/docs/models/([A-Za-z0-9._-]+)"]
+
+[[sources]]
+id = "google_vertex"
+name = "Google Vertex model versions"
+url = "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions.md.txt"
+kind = "html_regex"
+patterns = [
+  '`((?:gemini|gemma|imagen|veo|lyria|text-embedding|textembedding)[A-Za-z0-9._@-]+)`',
+]
+
+[[sources]]
+id = "openai_sdk"
+name = "OpenAI SDK ChatModel"
+url = "https://cdn.jsdelivr.net/gh/openai/openai-python@main/src/openai/types/shared/chat_model.py"
+kind = "html_regex"
+patterns = ['"((?:gpt-|o[0-9]|chatgpt-|codex-)[A-Za-z0-9._-]*)"']
+
+[[sources]]
+id = "xai_sdk"
+name = "xAI SDK chat models"
+url = "https://cdn.jsdelivr.net/gh/vercel/ai@main/packages/xai/src/xai-chat-language-model-options.ts"
+kind = "html_regex"
+patterns = ["'(grok-[A-Za-z0-9._-]+)'"]
+
+[[sources]]
+id = "catwalk"
+name = "Catwalk providers"
+url = "https://catwalk.charm.land/v2/providers"
+kind = "catwalk"
+
+# Portkey /v1/models is workspace-scoped (401). Public pricing JSON is keyless.
+# google.json splits the same ID into -gt-128k / -lte-128k rows. Vertex keys are clean.
+[[sources]]
+id = "portkey_xai"
+name = "Portkey xAI prices"
+url = "https://configs.portkey.ai/pricing/x-ai.json"
+kind = "object_keys"
+
+[[sources]]
+id = "portkey_groq"
+name = "Portkey Groq prices"
+url = "https://configs.portkey.ai/pricing/groq.json"
+kind = "object_keys"
+
+[[sources]]
+id = "portkey_mistral"
+name = "Portkey Mistral prices"
+url = "https://configs.portkey.ai/pricing/mistral-ai.json"
+kind = "object_keys"
+
+[[sources]]
+id = "portkey_vertex"
+name = "Portkey Vertex prices"
+url = "https://configs.portkey.ai/pricing/vertex-ai.json"
+kind = "object_keys"

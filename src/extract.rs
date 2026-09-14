@@ -6,6 +6,7 @@ pub fn extract(kind: &str, value: &Value) -> Result<Vec<String>, String> {
         "openai_list" => openai_list(value),
         "models_dev" => models_dev(value),
         "object_keys" => object_keys(value),
+        "catwalk" => catwalk(value),
         other => return Err(format!("unknown kind {other}")),
     };
     ids.sort();
@@ -57,10 +58,27 @@ fn object_keys(value: &Value) -> Vec<String> {
         return ids;
     };
     for key in map.keys() {
-        if key == "sample_spec" {
+        if key == "sample_spec" || key == "default" {
             continue;
         }
         push_id(&mut ids, Some(key));
+    }
+    ids
+}
+
+/// Catwalk / Crush provider registry: `[{ models: [{ id }] }, ...]`.
+fn catwalk(value: &Value) -> Vec<String> {
+    let mut ids = Vec::new();
+    let Some(arr) = value.as_array() else {
+        return ids;
+    };
+    for provider in arr {
+        let Some(models) = provider.get("models").and_then(|v| v.as_array()) else {
+            continue;
+        };
+        for model in models {
+            push_id(&mut ids, model.get("id").and_then(|v| v.as_str()));
+        }
     }
     ids
 }
@@ -96,7 +114,9 @@ fn sanitize_id(raw: &str) -> Option<String> {
     let mut s = raw.trim().trim_matches(|c| {
         matches!(c, '"' | '\'' | '`' | ',' | ')' | '(' | '[' | ']' | '{' | '}' | '*' | '\\')
     });
-    if let Some(stripped) = s.strip_suffix(".md") {
+    if let Some(stripped) = s.strip_suffix(".md.txt") {
+        s = stripped;
+    } else if let Some(stripped) = s.strip_suffix(".md") {
         s = stripped;
     }
     if s.len() < 2 || s.len() > 90 {
@@ -104,6 +124,21 @@ fn sanitize_id(raw: &str) -> Option<String> {
     }
     let lower = s.to_ascii_lowercase();
     if s.contains("://") || s.contains(' ') || s.contains('<') || s.contains('\n') {
+        return None;
+    }
+    const EXACT_BAD: &[&str] = &[
+        "imagen",
+        "veo",
+        "gemini",
+        "gemma",
+        "lyria",
+        "models",
+        "docs",
+        "api",
+        "chat",
+        "default",
+    ];
+    if EXACT_BAD.iter().any(|b| lower == *b) {
         return None;
     }
     const BAD: &[&str] = &[
@@ -128,6 +163,12 @@ fn sanitize_id(raw: &str) -> Option<String> {
         ".json",
         "mistral-color",
         "mistral-rag",
+        "gemini-api",
+        "gemini-capabilities",
+        "gemini-edit-images",
+        "gemini-enterprise",
+        "nano-banana-models",
+        ".txt",
     ];
     if BAD.iter().any(|b| lower.contains(b)) {
         return None;
@@ -188,6 +229,7 @@ mod tests {
     fn object_keys_skips_sample_spec() {
         let v = json!({
             "sample_spec": {"max_tokens": 1},
+            "default": {"pricing_config": {}},
             "gpt-4o": {"litellm_provider": "openai"},
             "claude-sonnet-4": {}
         });
@@ -231,6 +273,48 @@ chatgpt-preview.localhost
         assert!(ids.contains(&"accounts/fireworks/models/qwen3p7-plus".into()));
         assert!(ids.contains(&"meta-llama/Llama-3.3-70B-Instruct-Turbo".into()));
         assert!(!ids.iter().any(|s| s.contains("image") || s.contains("woff") || s.contains("localhost")));
+    }
+
+    #[test]
+    fn html_regex_google_md_txt_paths() {
+        let text = r#"
+- [Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash.md.txt)
+- [Lyria 3.5](https://ai.google.dev/gemini-api/docs/models/lyria-3.5.md)
+- [Imagen](https://ai.google.dev/gemini-api/docs/models/imagen.md.txt)
+- [Gemini API](https://ai.google.dev/gemini-api/docs.md.txt)
+"#;
+        let ids = extract_text(
+            "html_regex",
+            text,
+            &[r"/docs/models/([A-Za-z0-9._-]+)".into()],
+        )
+        .unwrap();
+        assert_eq!(
+            ids,
+            vec!["gemini-3.8-flash".to_string(), "lyria-3.5".to_string()]
+        );
+        assert!(!ids.iter().any(|s| s == "imagen" || s.contains("gemini-api") || s.contains(".txt")));
+    }
+
+    #[test]
+    fn catwalk_nested_model_ids() {
+        let v = json!([
+            {
+                "id": "openai",
+                "models": [
+                    {"id": "gpt-6-astra"},
+                    {"id": "gpt-5.6-sol"}
+                ]
+            },
+            {
+                "id": "xai",
+                "models": [{"id": "grok-4.20"}]
+            }
+        ]);
+        assert_eq!(
+            extract("catwalk", &v).unwrap(),
+            vec!["gpt-5.6-sol", "gpt-6-astra", "grok-4.20"]
+        );
     }
 
     #[test]

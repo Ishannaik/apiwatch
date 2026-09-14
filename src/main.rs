@@ -218,6 +218,12 @@ fn fetch_source(
         .user_agent(UA)
         .build();
     let mut req = agent.get(&src.url);
+    if src.kind == "html_regex" {
+        req = req.set(
+            "Accept",
+            "text/markdown, text/plain, text/html;q=0.8, */*;q=0.5",
+        );
+    }
     if let Some(etag) = prior.and_then(|p| p.etag.as_deref()) {
         req = req.set("If-None-Match", etag);
     }
