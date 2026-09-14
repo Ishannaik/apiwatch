@@ -30,6 +30,8 @@ struct Source {
     name: String,
     url: String,
     kind: String,
+    #[serde(default)]
+    patterns: Vec<String>,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone)]
@@ -227,6 +229,15 @@ fn fetch_source(
             if status == 304 {
                 let ids = prior.map(|p| p.ids.clone()).unwrap_or_default();
                 return (true, status, true, ms, ids, etag, None);
+            }
+            if src.kind == "html_regex" {
+                return match resp.into_string() {
+                    Ok(text) => match extract::extract_text(&src.kind, &text, &src.patterns) {
+                        Ok(ids) => (true, status, false, ms, ids, etag, None),
+                        Err(e) => (false, status, false, ms, vec![], None, Some(e)),
+                    },
+                    Err(e) => (false, status, false, ms, vec![], None, Some(e.to_string())),
+                };
             }
             match resp.into_json::<Value>() {
                 Ok(value) => match extract::extract(&src.kind, &value) {

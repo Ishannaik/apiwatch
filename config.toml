@@ -1,8 +1,8 @@
 timeout_secs = 30
 webhook_env = "WEBHOOK"
 
-# Public catalogs only. OpenAI / Anthropic / Gemini / xAI / Groq /v1/models
-# return 401/403 without a key.
+# Public catalogs only. Lab /v1/models endpoints 401 without a key.
+# Those labs are watched via public docs markdown (html_regex) and aggregators.
 
 [[sources]]
 id = "openrouter"
@@ -51,3 +51,58 @@ id = "litellm"
 name = "LiteLLM prices"
 url = "https://cdn.jsdelivr.net/gh/BerriAI/litellm@main/model_prices_and_context_window.json"
 kind = "object_keys"
+
+[[sources]]
+id = "openai_docs"
+name = "OpenAI docs"
+url = "https://platform.openai.com/docs/models.md"
+kind = "html_regex"
+patterns = ["/docs/models/([A-Za-z0-9._-]+)"]
+
+[[sources]]
+id = "anthropic_docs"
+name = "Anthropic docs"
+url = "https://docs.anthropic.com/en/docs/about-claude/models.md"
+kind = "html_regex"
+patterns = ["\\b(claude-[a-z]+(?:-[a-z]+)*-[0-9][a-z0-9.-]*)"]
+
+[[sources]]
+id = "anthropic_mirror"
+name = "Anthropic models.json"
+url = "https://cdn.jsdelivr.net/gh/combinatrix-ai/claude-models-list@main/models.json"
+kind = "openai_list"
+
+[[sources]]
+id = "xai_docs"
+name = "xAI docs"
+url = "https://docs.x.ai/developers/models.md"
+kind = "html_regex"
+patterns = ["\\b(grok-[0-9][A-Za-z0-9.-]*)"]
+
+[[sources]]
+id = "groq_docs"
+name = "Groq docs"
+url = "https://console.groq.com/docs/models.md"
+kind = "html_regex"
+patterns = ["/docs/model/([A-Za-z0-9_./-]+)"]
+
+[[sources]]
+id = "together_docs"
+name = "Together docs"
+url = "https://docs.together.ai/docs/serverless-models.md"
+kind = "html_regex"
+patterns = ["\\b([A-Za-z][A-Za-z0-9._-]+/[A-Za-z0-9._-]+)\\b"]
+
+[[sources]]
+id = "fireworks_docs"
+name = "Fireworks docs"
+url = "https://docs.fireworks.ai/getting-started/models.md"
+kind = "html_regex"
+patterns = ["(accounts/fireworks/(?:models|routers)/[A-Za-z0-9._-]+)"]
+
+[[sources]]
+id = "mistral_docs"
+name = "Mistral docs"
+url = "https://docs.mistral.ai/getting-started/models/models_overview"
+kind = "html_regex"
+patterns = ["\\b((?:mistral|codestral|pixtral|ministral|devstral|magistral|voxtral|open-mistral|open-mixtral)-[a-z0-9][a-z0-9.-]*)"]

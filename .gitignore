@@ -4,3 +4,4 @@ cache.tmp
 web/state.json
 web/state.tmp
 *.tmp
+tmp-scan/
