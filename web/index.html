@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <title>API watch</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <header>
@@ -13,7 +13,24 @@
     <p class="meta"><span id="stamp">Loading…</span></p>
   </header>
   <section id="attention" class="attention" hidden></section>
-  <section>
+  <nav class="filters" id="filters" aria-label="Labs">
+    <button type="button" data-filter="frontier" class="on">Frontier</button>
+    <button type="button" data-filter="openai">OpenAI</button>
+    <button type="button" data-filter="google">Gemini</button>
+    <button type="button" data-filter="anthropic">Anthropic</button>
+    <button type="button" data-filter="xai">xAI</button>
+    <button type="button" data-filter="mistral">Mistral</button>
+    <button type="button" data-filter="groq">Groq</button>
+    <button type="button" data-filter="all">All</button>
+  </nav>
+  <h2>New</h2>
+  <ul id="events" class="events"></ul>
+  <h2 id="models-heading">Frontier</h2>
+  <input id="q" type="search" placeholder="Filter model IDs" autocomplete="off">
+  <p class="meta" id="idmeta"></p>
+  <div id="labs"></div>
+  <h2>Sources</h2>
+  <div class="ledger-wrap">
     <table class="ledger">
       <thead>
         <tr>
@@ -27,13 +44,7 @@
       </thead>
       <tbody id="sources"></tbody>
     </table>
-  </section>
-  <h2>Recent changes</h2>
-  <ul id="events" class="events"></ul>
-  <h2>IDs</h2>
-  <input id="q" type="search" placeholder="Filter model IDs" autocomplete="off">
-  <p class="meta" id="idmeta"></p>
-  <ul id="ids" class="ids"></ul>
-  <script src="app.js"></script>
+  </div>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
