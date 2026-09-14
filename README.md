@@ -12,6 +12,7 @@ This is the cheatyyyy-style model-list watch without API keys. Provider endpoint
 | Vercel AI Gateway | `https://ai-gateway.vercel.sh/v1/models` | none |
 | Hugging Face router | `https://router.huggingface.co/v1/models` | none |
 | Naga | `https://api.naga.ac/v1/models` | none |
+| AIMLAPI | `https://api.aimlapi.com/models` | none |
 | DeepInfra | `https://api.deepinfra.com/v1/openai/models` | none |
 | models.dev | `https://models.dev/api.json` | none |
 | LiteLLM prices | jsDelivr `model_prices_and_context_window.json` | none |

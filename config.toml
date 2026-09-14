@@ -29,6 +29,12 @@ url = "https://api.naga.ac/v1/models"
 kind = "openai_list"
 
 [[sources]]
+id = "aimlapi"
+name = "AIMLAPI"
+url = "https://api.aimlapi.com/models"
+kind = "openai_list"
+
+[[sources]]
 id = "deepinfra"
 name = "DeepInfra"
 url = "https://api.deepinfra.com/v1/openai/models"
