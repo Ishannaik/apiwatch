@@ -1,0 +1,22 @@
+# API catalog watcher. watch.ishannaik.com -> this box Tailscale IP.
+# Static files in /var/www/apiwatch. Poller is systemd timer apiwatch.timer.
+# DNS is Cloudflare grey-cloud A to 100.68.165.73 — never the public NIC, never proxied.
+watch.ishannaik.com {
+	bind 100.68.165.73
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1 1.0.0.1
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy no-referrer
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+		-Server
+	}
+	header Cache-Control "no-store"
+	root * /var/www/apiwatch
+	file_server
+	encode gzip
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>API watch</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>API watch</h1>
+    <p class="meta"><span id="stamp">Loading…</span></p>
+  </header>
+  <section id="attention" class="attention" hidden></section>
+  <section>
+    <table class="ledger">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Models</th>
+          <th>Added</th>
+          <th>Removed</th>
+          <th>Status</th>
+          <th>ms</th>
+        </tr>
+      </thead>
+      <tbody id="sources"></tbody>
+    </table>
+  </section>
+  <h2>Recent changes</h2>
+  <ul id="events" class="events"></ul>
+  <h2>IDs</h2>
+  <input id="q" type="search" placeholder="Filter model IDs" autocomplete="off">
+  <p class="meta" id="idmeta"></p>
+  <ul id="ids" class="ids"></ul>
+  <script src="app.js"></script>
+</body>
+</html>

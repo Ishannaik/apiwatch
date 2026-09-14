@@ -1,0 +1,35 @@
+timeout_secs = 25
+webhook_env = "WEBHOOK"
+
+# Public catalogs only. OpenAI / Anthropic / Gemini / xAI / Groq /v1/models
+# return 401/403 without a key.
+
+[[sources]]
+id = "openrouter"
+name = "OpenRouter"
+url = "https://openrouter.ai/api/v1/models"
+kind = "openai_list"
+
+[[sources]]
+id = "vercel"
+name = "Vercel AI Gateway"
+url = "https://ai-gateway.vercel.sh/v1/models"
+kind = "openai_list"
+
+[[sources]]
+id = "deepinfra"
+name = "DeepInfra"
+url = "https://api.deepinfra.com/v1/openai/models"
+kind = "openai_list"
+
+[[sources]]
+id = "models_dev"
+name = "models.dev"
+url = "https://models.dev/api.json"
+kind = "models_dev"
+
+[[sources]]
+id = "litellm"
+name = "LiteLLM prices"
+url = "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"
+kind = "object_keys"

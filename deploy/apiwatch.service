@@ -1,0 +1,23 @@
+[Unit]
+Description=apiwatch public LLM catalog poller
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+EnvironmentFile=-/etc/apiwatch.env
+ExecStart=/usr/local/bin/apiwatch --config /etc/apiwatch/config.toml --cache /var/lib/apiwatch/cache.json --out /var/www/apiwatch
+WorkingDirectory=/var/lib/apiwatch
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ReadWritePaths=/var/lib/apiwatch /var/www/apiwatch
+
+[Install]
+WantedBy=multi-user.target
